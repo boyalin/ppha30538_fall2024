@@ -1,0 +1,433 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"ps1\"\n",
+        "format:\n",
+        "  html:\n",
+        "    code-fold: true\n",
+        "jupyter: python3\n",
+        "---\n",
+        "\n",
+        "\n",
+        "## Question 1\n",
+        "### 1"
+      ],
+      "id": "d3b5debe"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import time\n",
+        "import pandas as pd\n",
+        "\n",
+        "# Start the timer\n",
+        "start_time = time.time()\n",
+        "\n",
+        "# Read the CSV file\n",
+        "df = pd.read_csv('data/parking_tickets_one_percent.csv')\n",
+        "\n",
+        "# Stop the timer and calculate duration\n",
+        "duration = time.time() - start_time\n",
+        "print(f\"Time taken to read the file: {duration:.2f} seconds\")\n",
+        "\n",
+        "# Assert statement to verify the number of rows\n",
+        "assert len(df) == 287458, f\"Expected 287458 rows, but got {len(df)}\""
+      ],
+      "id": "f8a9fb96",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 2"
+      ],
+      "id": "e7304196"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import os\n",
+        "import math\n",
+        "\n",
+        "# Get the size of the sample file in bytes\n",
+        "file_size_bytes = os.path.getsize('data/parking_tickets_one_percent.csv')\n",
+        "\n",
+        "# Convert to megabytes\n",
+        "file_size_mb = file_size_bytes / (1024 * 1024)\n",
+        "print(f\"File size of 1% sample: {file_size_mb:.2f} MB\")\n",
+        "\n",
+        "# Use math to calculate the full dataset size (since the sample is 1% of the total dataset)\n",
+        "predicted_full_size_mb = file_size_mb * 100\n",
+        "print(f\"Predicted full dataset size: {predicted_full_size_mb} MB\")"
+      ],
+      "id": "fd33bd65",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 3"
+      ],
+      "id": "5bb03ca6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "ordered_col_name = \"issue_date\"\n",
+        "print(f\"Upon inspection, the dataset is sorted by column {ordered_col_name}.\")\n",
+        "\n",
+        "# Convert this \"issue_date\" column to datetime object\n",
+        "df[ordered_col_name] = pd.to_datetime(df[ordered_col_name])\n",
+        "\n",
+        "# Subsetting the first 500 rows\n",
+        "subset_df = df.head(500)\n",
+        "\n",
+        "# Function to check if a column is ordered\n",
+        "def is_column_ordered(df, column):\n",
+        "  '''\n",
+        "  Check whether a column is ordered\n",
+        "\n",
+        "  Args:\n",
+        "    1) df: dataframe\n",
+        "    2) column: column to check\n",
+        "  '''\n",
+        "\n",
+        "  # return df[column].is_monotonic\n",
+        "\n",
+        "# Test if \"issue_date\" is ordered\n",
+        "is_ordered = is_column_ordered(subset_df, ordered_col_name)\n",
+        "print(f\"Is the column '{ordered_col_name}' ordered? {is_ordered}\")"
+      ],
+      "id": "6e2c5f4d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Question 2\n",
+        "### 1"
+      ],
+      "id": "9eb695a7"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "n_tickets_sample = len(df[df['issue_date'].dt.year == 2017])\n",
+        "print(f\"There are in total {n_tickets_sample} in the data in 2017\")\n",
+        "\n",
+        "n_tickets = n_tickets_sample * 100\n",
+        "print(f\"This implies that there may be in total {n_tickets} in the full data in 2017.\")\n",
+        "\n",
+        "print(\"According to the ProPublica article, more than 3 million tickets were issueed each year for parking, vehicle compliance, and automated traffic camera violations\")\n",
+        "\n",
+        "print(\"Yes, there is a meaningful difference: The difference between your estimate (2.24 million) and the ProPublica figure (3 million) is around 760,000 tickets, which represents approximately a 25% difference. Given that the ProPublica data covers a broad range of years and mentions more than 3 million tickets per year, this discrepancy could be due to variations in ticket issuance rates year by year. However, a 25% difference is substantial enough to warrant attention and may suggest either: A lower ticket issuance rate specifically in 2017; 2) Incomplete or non-representative sampling in your dataset.\")"
+      ],
+      "id": "3e154c19",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 2"
+      ],
+      "id": "41a7a89c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "# Plotting the bar graph\n",
+        "plt.figure(figsize=(10, 6))\n",
+        "df['violation_description'].value_counts().nlargest(20).plot(kind='bar')\n",
+        "\n",
+        "# Formatting the graph\n",
+        "plt.title('Top 20 Most Frequent Violation Types', fontsize=16)\n",
+        "plt.xlabel('Violation Description', fontsize=12)\n",
+        "plt.ylabel('Frequency', fontsize=12)\n",
+        "plt.xticks(rotation=45, ha='right', fontsize=10)  # Adjust x-ticks for readability\n",
+        "plt.tight_layout()\n",
+        "\n",
+        "# Show the plot\n",
+        "plt.show()"
+      ],
+      "id": "5328d5d7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Question 3\n",
+        "### 1\n",
+        "\n",
+        "| **Variable Name**          | **Data Type(s)**       |\n",
+        "|----------------------------|------------------------|\n",
+        "| `ticket_number`             | Nominal (N)            |\n",
+        "| `issue_date`                | Temporal (T)           |\n",
+        "| `violation_location`        | Nominal (N)            |\n",
+        "| `license_plate_number`      | Nominal (N)            |\n",
+        "| `license_plate_state`       | Nominal (N)            |\n",
+        "| `license_plate_type`        | Nominal (N)            |\n",
+        "| `zipcode`                   | Nominal (N)            |\n",
+        "| `violation_code`            | Nominal (N) |\n",
+        "| `violation_description`     | Nominal (N)            |\n",
+        "| `unit`                      | Nominal (N)            |\n",
+        "| `unit_description`          | Nominal (N)            |\n",
+        "| `vehicle_make`              | Nominal (N)            |\n",
+        "| `fine_level1_amount`        | Quantitative (Q)       |\n",
+        "| `fine_level2_amount`        | Quantitative (Q)       |\n",
+        "| `current_amount_due`        | Quantitative (Q)       |\n",
+        "| `total_payments`            | Quantitative (Q)       |\n",
+        "| `ticket_queue`              | Nominal (N)            |\n",
+        "| `ticket_queue_date`         | Temporal (T)           |\n",
+        "| `notice_level`              | Ordinal (O)            |\n",
+        "| `hearing_disposition`       | Nominal (N)            |\n",
+        "| `notice_number`             | Nominal (N)            |\n",
+        "| `officer`                   | Nominal (N)            |\n",
+        "| `address`                   | Nominal (N)            |\n",
+        "\n",
+        "### 2"
+      ],
+      "id": "fe596d27"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Calculate fraction of tickets marked as paid for each vehicle make\n",
+        "paid_fraction = df[['vehicle_make', 'ticket_queue']].groupby('vehicle_make')['ticket_queue'].apply(lambda x: (x == 'Paid').mean()).sort_values(ascending=False)\n",
+        "\n",
+        "# Plotting the results\n",
+        "plt.figure(figsize=(10, 6))\n",
+        "paid_fraction.plot(kind='bar')\n",
+        "\n",
+        "# Formatting the graph\n",
+        "plt.title('Fraction of Tickets Marked as Paid for Each Vehicle Make', fontsize=16)\n",
+        "plt.xlabel('Vehicle Make', fontsize=12)\n",
+        "plt.ylabel('Fraction of Paid Tickets', fontsize=12)\n",
+        "plt.xticks(rotation=45, ha='right', fontsize=10)  # Adjust x-ticks for readability\n",
+        "plt.tight_layout()\n",
+        "\n",
+        "# Show the plot\n",
+        "plt.show()"
+      ],
+      "id": "0c0f9045",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "I think this could be related to **wealth correlation**. Specifically, owners of luxury or expensive vehicles might be more likely to pay their tickets promptly, as they may have more financial resources to do so.\n",
+        "\n",
+        "\n",
+        "### 3"
+      ],
+      "id": "b3599f34"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import altair as alt\n",
+        "\n",
+        "# Group data by day or month to count the number of tickets issued over time\n",
+        "tickets_over_time = df.groupby(df['issue_date'].dt.date).size().reset_index(name='count')\n",
+        "\n",
+        "# Convert 'issue_date' to string to avoid serialization issues\n",
+        "tickets_over_time['issue_date'] = tickets_over_time['issue_date'].astype(str)\n",
+        "\n",
+        "# Create the filled step chart with Altair\n",
+        "chart = alt.Chart(tickets_over_time).mark_area(\n",
+        "    color=\"lightblue\",\n",
+        "    interpolate='step-after',\n",
+        "    line=True\n",
+        ").encode(\n",
+        "    x='issue_date:T',  # Temporal encoding for the date\n",
+        "    y='count:Q'  # Quantitative encoding for the count of tickets\n",
+        ").properties(\n",
+        "    title='Number of Parking Tickets Issued Over Time'\n",
+        ")\n",
+        "\n",
+        "chart.show()"
+      ],
+      "id": "32667081",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 4"
+      ],
+      "id": "f1f1421d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Extract month and day for the heatmap\n",
+        "df['month'] = df['issue_date'].dt.month\n",
+        "df['day'] = df['issue_date'].dt.day\n",
+        "\n",
+        "# Group data by month and day to get the number of tickets issued on each day\n",
+        "tickets_per_day = df.groupby(['month', 'day']).size().reset_index(name='count')\n",
+        "\n",
+        "# Create the heatmap using Altair\n",
+        "heatmap = alt.Chart(tickets_per_day, title=\"Tickets Issued by Month and Day\").mark_rect().encode(\n",
+        "    alt.X(\"day:O\", title=\"Day\"),\n",
+        "    alt.Y(\"month:O\", title=\"Month\"),\n",
+        "    alt.Color(\"count:Q\", title=\"Number of Tickets\"),\n",
+        "    tooltip=[\n",
+        "        alt.Tooltip(\"month:O\", title=\"Month\"),\n",
+        "        alt.Tooltip(\"day:O\", title=\"Day\"),\n",
+        "        alt.Tooltip(\"count:Q\", title=\"Number of Tickets\"),\n",
+        "    ]\n",
+        ").properties(\n",
+        "    width=600,  # Set chart width\n",
+        "    height=400  # Set chart height\n",
+        ").configure_view(\n",
+        "    step=13,\n",
+        "    strokeWidth=0\n",
+        ").configure_axis(\n",
+        "    domain=False,\n",
+        "    grid=False\n",
+        ")\n",
+        "\n",
+        "# Show the heatmap\n",
+        "heatmap.show()"
+      ],
+      "id": "6eb22a6a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 5"
+      ],
+      "id": "af2a53c6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Subset to the five most common violation types\n",
+        "top_violations = df['violation_description'].value_counts().nlargest(5).index\n",
+        "df_subset = df[df['violation_description'].isin(top_violations)]\n",
+        "\n",
+        "# Group data by violation type and time (e.g., month/year) to get the number of tickets issued\n",
+        "df_subset['yearmonth'] = df_subset['issue_date'].dt.to_period('M')  # Year and month\n",
+        "tickets_by_time = df_subset.groupby(['violation_description', 'yearmonth']).size().reset_index(name='count')\n",
+        "\n",
+        "# Convert 'yearmonth' back to datetime for Altair\n",
+        "tickets_by_time['yearmonth'] = tickets_by_time['yearmonth'].dt.to_timestamp()\n",
+        "\n",
+        "# Create the Lasagna Plot using Altair\n",
+        "color_condition = alt.condition(\n",
+        "    \"month(datum.yearmonth) == 1 && date(datum.yearmonth) == 1\",\n",
+        "    alt.value(\"black\"),\n",
+        "    alt.value(None),\n",
+        ")\n",
+        "\n",
+        "lasagna_plot = alt.Chart(tickets_by_time).mark_rect().encode(\n",
+        "    alt.X(\"yearmonth:T\")\n",
+        "        .title(\"Time\")\n",
+        "        .axis(\n",
+        "            format=\"%Y-%m\",  # Format as year and month\n",
+        "            labelAngle=0,\n",
+        "            labelOverlap=False,\n",
+        "            labelColor=color_condition,\n",
+        "            tickColor=color_condition,\n",
+        "        ),\n",
+        "    alt.Y(\"violation_description:N\").title(None),\n",
+        "    alt.Color(\"count:Q\").title(\"Number of Tickets\")\n",
+        ").properties(\n",
+        "    width=600,  # Set chart width\n",
+        "    height=200  # Set chart height\n",
+        ")\n",
+        "\n",
+        "# Show the plot\n",
+        "lasagna_plot.show()"
+      ],
+      "id": "16a669c8",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 6\n",
+        "1. Filled Step Chart\n",
+        "  - Pros:\n",
+        "    1. Good for time series analysis (easy to visualize changes)\n",
+        "    2. Appropriate for continuous data\n",
+        "    3. The step pattern makes it easy to understand when and how of pattern changes over time.\n",
+        "  - Cons:\n",
+        "    1. There is no breakdown by category (focusing only on the overall number).\n",
+        "    2. Not suitable for comparing days or months. \n",
+        "\n",
+        "2. Annual Weather Heatmap\n",
+        "  - Pros:\n",
+        "  \t1. Great for spotting seasonality\n",
+        "    2. Detailed day-by-day view\n",
+        "    3. Good color intensity, which helps identify “hot spots” of activities\n",
+        "  - Cons:\n",
+        "    1. Difficult to compare categories\n",
+        "    2. Overwhelming for large datasets (especially when having too many data points)\n",
+        "\n",
+        "3. Lasagna Plot\n",
+        "  - Pros:\n",
+        "    1. Good for comparing categories\n",
+        "    2. Good color intensity, which helps identify “hot spots” of activities\n",
+        "    3. Combines both time trends and category comparisons\n",
+        "  - Cons\n",
+        "    1. More complex to interpret\n",
+        "    2. Potential for oversaturation (with too many categories or too much data)\n",
+        "\n",
+        "### 7\n",
+        "If the main goal is to show that the enforcement of violations is not evenly distributed over time, Lasagna Plot would be the best choice. \n",
+        "\n",
+        "First, it shows both time and categories. The lasagna plot doesn’t just show overall ticket issuance. It allows you to see how different violation types are enforced differently over time. This is key when the lesson is about uneven distribution.\n",
+        "\n",
+        "Second, it shows category-level details. If some types of violations are enforced more rigorously at specific times, the lasagna plot will make this clear.\n",
+        "\n",
+        "Finally, the use of color allows for quick identification of time periods with heightened enforcement activity for specific types of violations, making unevenness clear at both a temporal and categorical level.\n"
+      ],
+      "id": "072d08a8"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Users/boyalin/Library/Python/3.9/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
